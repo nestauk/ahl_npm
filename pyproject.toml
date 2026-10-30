@@ -1,0 +1,95 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "ahl_npm/__init__.py"
+
+[project]
+name = "ahl-npm"
+dynamic = ["version"]
+description = "Functions and configuration for calculating Nutrient Profiling Model (NPM) scores"
+authors = [{ name = "Nesta" }]
+license = "MIT"
+readme = "README.md"
+keywords = ["nutrient profiling model", "NPM", "HFSS", "nutrition", "numpy", "polars"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.26", "polars>=1.25", "pyyaml>=6.0"]
+
+[project.urls]
+repository = "https://github.com/nestauk/ahl_npm"
+issues = "https://github.com/nestauk/ahl_npm/issues"
+
+[dependency-groups]
+test = ["pytest>=8"]
+dev = [{ include-group = "test" }, "ipykernel", "jupytext", "nbstripout", "ruff", "pre-commit", "tox>=4.25", "tox-uv>=1.25"]
+
+[tool.uv]
+package = true
+
+# The tests under each supported Python, with the newest dependencies there are, and (`lowest`) under the oldest
+# Python with the oldest each allows. Each resolves afresh, as a project installing ahl-npm would, not from uv.lock.
+[tool.tox]
+requires = ["tox>=4.25", "tox-uv>=1.25"]
+env_list = ["py310", "py311", "py312", "py313", "py314", "py315", "lowest"]
+
+[tool.tox.env_run_base]
+description = "Run the tests under {base_python}"
+dependency_groups = ["test"]
+commands = [["pytest", { replace = "posargs", extend = true }]]
+
+[tool.tox.env.lowest]
+description = "Run the tests under Python 3.10 with the oldest numpy, polars and PyYAML ahl-npm allows"
+base_python = ["python3.10"]
+uv_resolution = "lowest-direct"
+
+# Emit `.pre-commit-config.yaml` in prettier's style so the two hooks don't fight.
+[tool.pre-commit-update.yaml]
+mapping = 2
+sequence = 4
+offset = 2
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "ANN", # flake8-annotations
+    "B",   # flake8-bugbear: Likely bugs
+    "C",   # flake8-comprehensions and mccabe complexity
+    "D",   # pydocstyle: Docstrings
+    "E",   # pycodestyle: Errors (default)
+    "F",   # pyflakes: Linter
+    "I",   # isort
+    "N",   # pep8-naming: Naming conventions
+    "W",   # pycodestyle: Warnings (default)
+]
+ignore = [
+    "D100", # Warns about missing module-level docstrings
+    "S101", # Warns about assert being removed when compiled
+    "ANN002", # Warns about missing type annotation on *args
+    "ANN003", # Warns about missing type annotation on **kwargs
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ahl_npm"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "E402", "D104"]
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = "dynamic"

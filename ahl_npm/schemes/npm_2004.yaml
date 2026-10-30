@@ -1,0 +1,50 @@
+# NPM 2004/05, as set out in the Department of Health's technical guidance:
+# https://www.gov.uk/government/publications/the-nutrient-profiling-model
+# https://assets.publishing.service.gov.uk/media/695e87982a4a53b73d513855/NutrientProfilingModel_2004_2005_TechnicalGuidance.pdf
+#
+# A component scores the points against the highest threshold its value per 100 g is above (1, 2, 3, ... unless
+# `points` says otherwise), and none at or below the lowest. Thresholds are in the guidance's own units.
+name: "2004"
+source: https://www.gov.uk/government/publications/the-nutrient-profiling-model
+
+components:
+  energy:
+    kind: A
+    unit: kJ
+    thresholds: [335, 670, 1005, 1340, 1675, 2010, 2345, 2680, 3015, 3350]
+  satfat:
+    kind: A
+    unit: g
+    thresholds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  sugars: # total sugars
+    kind: A
+    unit: g
+    thresholds: [4.5, 9, 13.5, 18, 22.5, 27, 31, 36, 40, 45]
+  sodium:
+    kind: A
+    unit: mg
+    thresholds: [90, 180, 270, 360, 450, 540, 630, 720, 810, 900]
+  protein:
+    kind: C
+    unit: g
+    thresholds: [1.6, 3.2, 4.8, 6.4, 8]
+  fibre: # by the AOAC method
+    kind: C
+    unit: g
+    thresholds: [0.9, 1.9, 2.8, 3.7, 4.7]
+  fvn: # fruit, vegetables and nuts, as a % of the product
+    kind: C
+    unit: "%"
+    thresholds: [40, 60, 80]
+    points: [1, 2, 5]
+
+# Protein stops counting once the A points reach `a_points`, unless `component` scores `points`.
+protein_cap:
+  a_points: 11
+  component: fvn
+  points: 5
+
+# The score from which a food, or a drink, is less healthy.
+less_healthy:
+  food: 4
+  drink: 1
