@@ -1,0 +1,35 @@
+name: Tests
+
+# Runs the tests under each supported Python version, and with the oldest dependency versions allowed (the tox envs
+# in pyproject.toml). Dependencies are resolved from PyPI each time, so the weekly run catches any new numpy or polars
+# release that breaks ahl-npm.
+on:
+  pull_request:
+  push:
+    branches: [dev, main]
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tox:
+    name: tox -e ${{ matrix.env }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [py310, py311, py312, py313, py314, py315, lowest]
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install tox
+        run: uv tool install tox --with tox-uv
+
+      - name: Run the tests
+        run: tox run -e ${{ matrix.env }}
